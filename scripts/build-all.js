@@ -14,7 +14,7 @@ const PKG_ROOT_DIR = path.join(__dirname,"..");
 const SRC_DIR = path.join(PKG_ROOT_DIR,"src");
 const MAIN_COPYRIGHT_HEADER = path.join(SRC_DIR,"copyright-header.txt");
 const NODE_MODULES_DIR = path.join(PKG_ROOT_DIR,"node_modules");
-const SCHEDULER_DIST = path.join(NODE_MODULES_DIR,"@byojs","scheduler","dist","scheduler.mjs");
+const BYOJS_SCHEDULER_DIST_DIR = path.join(NODE_MODULES_DIR,"@byojs","scheduler","dist");
 
 const DIST_DIR = path.join(PKG_ROOT_DIR,"dist");
 const DIST_EXTERNAL_DIR = path.join(DIST_DIR,"external");
@@ -70,9 +70,10 @@ async function main() {
 
 	// build dist/external/*
 	await buildFiles(
-		[ SCHEDULER_DIST, ],
-		path.dirname(SCHEDULER_DIST),
+		recursiveReadDir(BYOJS_SCHEDULER_DIST_DIR),
+		BYOJS_SCHEDULER_DIST_DIR,
 		DIST_EXTERNAL_BYOJS_SCHEDULER_DIR,
+		// simple copy as-is
 		(contents,outputPath) => ({ contents, outputPath, })
 	);
 

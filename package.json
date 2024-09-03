@@ -1,7 +1,7 @@
 {
 	"name": "@byojs/toggler",
 	"description": "Throttled toggler",
-	"version": "0.0.9",
+	"version": "0.1.0",
 	"exports": {
 		"./": "./dist/toggler.mjs"
 	},
