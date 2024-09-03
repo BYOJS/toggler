@@ -14,10 +14,12 @@ const PKG_ROOT_DIR = path.join(__dirname,"..");
 const SRC_DIR = path.join(PKG_ROOT_DIR,"src");
 const MAIN_COPYRIGHT_HEADER = path.join(SRC_DIR,"copyright-header.txt");
 const NODE_MODULES_DIR = path.join(PKG_ROOT_DIR,"node_modules");
-const TODO_DIST = path.join(NODE_MODULES_DIR,"--TODO--","dist","--TODO--");
+const SCHEDULER_DIST = path.join(NODE_MODULES_DIR,"@byojs","scheduler","dist","scheduler.mjs");
 
 const DIST_DIR = path.join(PKG_ROOT_DIR,"dist");
 const DIST_EXTERNAL_DIR = path.join(DIST_DIR,"external");
+const DIST_EXTERNAL_BYOJS_DIR = path.join(DIST_EXTERNAL_DIR,"@byojs");
+const DIST_EXTERNAL_BYOJS_SCHEDULER_DIR = path.join(DIST_EXTERNAL_BYOJS_DIR,"scheduler");
 
 
 main().catch(console.error);
@@ -30,9 +32,11 @@ async function main() {
 
 	// try to make various dist/ directories, if needed
 	for (let dir of [
-		DIST_DIR,
-		DIST_EXTERNAL_DIR,
-	]) {
+			DIST_DIR,
+			DIST_EXTERNAL_DIR,
+			DIST_EXTERNAL_BYOJS_DIR,
+			DIST_EXTERNAL_BYOJS_SCHEDULER_DIR,
+		]) {
 		if (!(await safeMkdir(dir))) {
 			throw new Error(`Target directory (${dir}) does not exist and could not be created.`);
 		}
@@ -51,7 +55,7 @@ async function main() {
 			.replace(/#YEAR#/g,(new Date()).getFullYear())
 	);
 
-	// build src/* to bundlers/*
+	// build src/* to dist/*
 	await buildFiles(
 		recursiveReadDir(SRC_DIR),
 		SRC_DIR,
@@ -66,9 +70,9 @@ async function main() {
 
 	// build dist/external/*
 	await buildFiles(
-		[ TODO_DIST, ],
-		path.dirname(TODO_DIST),
-		DIST_EXTERNAL_DIR,
+		[ SCHEDULER_DIST, ],
+		path.dirname(SCHEDULER_DIST),
+		DIST_EXTERNAL_BYOJS_SCHEDULER_DIR,
 		(contents,outputPath) => ({ contents, outputPath, })
 	);
 

@@ -3,20 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>--TODO--: Tests</title>
+<title>Toggler: Tests</title>
 </head>
 <body>
 
 <main>
-<h1>--TODO--: Tests</h1>
+<h1>Toggler: Tests</h1>
 
-<h3><a href="https://github.com/byojs/--TODO--">Github</a></h3>
+<h3><a href="https://github.com/byojs/toggler">Github</a></h3>
 
 <hr>
 
 <p>
-	<button type="button" id="todo-btn">--TODO--</button>
+	<button type="button" id="run-tests-btn">run tests</button>
 </p>
+
+<div id="test-results"></div>
 
 </main>
 
@@ -25,8 +27,10 @@
 <script type="importmap">
 {
 	"imports": {
-		"--TODO--/src": "./src/--TODO--.js",
-		"--TODO--/dist": "./dist/--TODO--.mjs"
+		"toggler/src": "./src/toggler.js",
+		"toggler/dist": "./dist/toggler.mjs",
+
+		"@byojs/scheduler": "./dist/external/@byojs/scheduler/scheduler.mjs"
 	}
 }
 </script>

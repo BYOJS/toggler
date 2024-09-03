@@ -1,12 +1,12 @@
 {
-	"name": "@byojs/--TODO--",
-	"description": "--TODO--",
-	"version": "0.0.0-TODO",
+	"name": "@byojs/toggler",
+	"description": "Throttled toggler",
+	"version": "0.0.9",
 	"exports": {
-		"./": "./dist/--TODO--.mjs"
+		"./": "./dist/toggler.mjs"
 	},
 	"browser": {
-		"@byojs/--TODO--": "./dist/--TODO--.mjs"
+		"@byojs/toggler": "./dist/toggler.mjs"
 	},
 	"scripts": {
 		"build:all": "node scripts/build-all.js",
@@ -17,7 +17,9 @@
 		"postinstall": "node scripts/postinstall.js",
 		"prepublishOnly": "npm run build:all"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"@byojs/scheduler": "~0.9.1"
+	},
 	"devDependencies": {
 		"micromatch": "~4.0.8",
 		"recursive-readdir-sync": "~1.0.6",
@@ -25,14 +27,21 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/byojs/--TODO--.git"
+		"url": "git+https://github.com/byojs/toggler.git"
 	},
-	"keywords": [],
+	"keywords": [
+		"debounce",
+		"throttle",
+		"toggle",
+		"scheduling",
+		"task",
+		"async"
+	],
 	"bugs": {
-		"url": "https://github.com/byojs/--TODO--/issues",
-		"email": "--TODO--"
+		"url": "https://github.com/byojs/toggler/issues",
+		"email": "getify@gmail.com"
 	},
-	"homepage": "https://github.com/byojs/--TODO--",
-	"author": "--TODO--",
+	"homepage": "https://github.com/byojs/toggler",
+	"author": "Kyle Simpson <getify@gmail.com>",
 	"license": "MIT"
 }
