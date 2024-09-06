@@ -3,7 +3,9 @@
 [![npm Module](https://badge.fury.io/js/@byojs%2Ftoggler.svg)](https://www.npmjs.org/package/@byojs/toggler)
 [![License](https://img.shields.io/badge/license-MIT-a1356a)](LICENSE.txt)
 
-**Toggler** is a tool to asynchronously (throttled) toggle between two operations.
+**Toggler** is a tool to asynchronously toggle between two operations, using [throttled/debounced task scheduling](https://github.com/byojs/scheduler?tab=readme-ov-file#overview).
+
+For example, managing the showing and hiding of a modal (UI blocking) spinner:
 
 ```js
 var toggle = Toggler(
@@ -18,6 +20,8 @@ toggle(showSpinner,hideSpinner);
 toggle(showSpinner,hideSpinner);
 ```
 
+**Note:** This example illustrates asynchronously toggling between showing a spinner and hiding it, with throttling/debouncing and cancellation all managed internally.
+
 ----
 
 [Library Tests (Demo)](https://byojs.dev/toggler/)
@@ -26,31 +30,50 @@ toggle(showSpinner,hideSpinner);
 
 ## Overview
 
-The main purpose of **Toggler** is to provide [debouncing and throttling](https://css-tricks.com/debouncing-throttling-explained-examples/) controls for managing async task scheduling.
+The main purpose of **Toggler** is to manage [scheduling (throttling/debouncing)](https://github.com/byojs/scheduler?tab=readme-ov-file#overview) when asynchronously toggling between two tasks.
 
-Both scheduling schemes reduce how many repeated calls to a single function will be processed, over a defined interval of time, but use different strategies for determining when to schedule those calls. And both strategies may operate in two forms: *leading* and *trailing*.
+**Toggler** allows you to specify a *delay* for each of two tasks. It uses this delay to schedule the *next* task -- i.e., it will run *task two* if *task one* most recently ran, or vice versa. Further, if the toggle is re-invoked *during* the scheduling delay for a task, that scheduled task is canceled (state is unchanged).
 
-### Throttling
+### Example: Spinner
 
-Throttling prevents a repeated function call from being processed more than once per defined interval of time (e.g., 100ms); an interval timer is started with the *first call* (which resets after each interval transpires).
+To illustrate, let's revisit the spinner example from above:
 
-With leading throttling, the initial call is processed immediately, and any subsequent call attempts, during the interval, will be ignored. With trailing throttling, only the last call is processed, *after* the full interval has transpired (since the first attempted call).
+```js
+var toggle = Toggler(
+    /*taskOneDelay=*/250,
+    /*taskTwoDelay=*/100
+);
 
-### Debouncing
+// (throttled) toggle on the spinner
+toggle(showSpinner,hideSpinner);
 
-Debouncing resets the delay interval with each attempted call of a function, meaning that the delay of processing an attempted call will continue to increase (unbounded), with each subsequent call attempt during the defined interval.
+// later, (throttled) toggle off the spinner
+toggle(showSpinner,hideSpinner);
+```
 
-With leading debouncing, the initial call is immediately processed, after which subsequent calls are debounced; once a full interval transpires without attempted calls, the most recent call is processed. With trailing debouncing, no initial call is processed, and every call is debounced.
+Here, the first `toggle()` call schedules the `showSpinner()` task to run in `250`ms; if `toggle()` is called again before that has delay has transpired, the scheduled call to `showSpinner()` is canceled (and the spinner stays hidden).
 
-Debouncing *might* effectively delay a function call indefinitely, if at least one call attempt is made during each defined interval of time. This is usually not preferred, so you can set an upper bound for the total debouncing delay, after which the most recent call will be processed and the debouncing interval reset.
+Likewise, if the spinner is visible and `toggle()` is called, `hideSpinner()` is delayed by `100`ms; if `toggle()` is called again before that delay has transpired, the scheduled call to `hideSpinner()` is canceled (and the spinner stays visible).
 
-### Canceling
+### Toggling use-cases
 
-Any throttled or debounced call that has not yet happened yet, may be canceled before it is processed.
+The spinner example above is a common use-case for something like **Toggler**. But any UI control that can be toggled between two states is a potential candidate.
 
-For example, you might debounce the initial display of a spinner (e.g., 500ms) for an async task that can vary in duration (like a network request); debouncing prevents the spinner from flashing visible and then being hidden very quickly -- if the network request finishes very quickly. But if the network request finishes even faster than the 500ms, you can cancel the scheduled display of the spinner.
+For example, you might use **Toggler** to asynchronously manage showing/hiding of hover/long-press tooltips, to avoid UX messy "quick flickering" of tooltips as a user moves their cursor or finger-touch around an interface. A brief delay on both show and hide will generally be friendlier for UX, requiring the user to pause over an element to express more obvious intent, etc. Similar goes for expanding menus/drop-downs.
 
-**Tip:** Debouncing the spinner showing, as described, still risks a potential UX hiccup. The network request might finish shortly after the debounce interval delay has transpired, which still quickly flickers the spinner. And this gets even worse if a subsequent async operation might be triggered (debounced) right after, such that the user might see a series of spinner flickers (on and off). One solution is to *also* debounce the canceling of a previous operation's debounce. In other words, the spinner might delay in being shown, but once shown, delay in its hiding. This approach [is essentially a debounced toggle (see **byojs/Toggler**)](https://github.com/byojs/toggler).
+Another reason to use **Toggler** would be to manage UI operations that involve animation (e.g., a sliding-in and sliding-out side drawer), since it can be very UX jarring for an animation to be interrupted when only partially complete. **Toggler** could for example ensure that once a *show* animation starts, it has a chance to gracefully finish before the element is hidden (either by animation or immediately).
+
+Even more affirmative user events like clicks/taps -- e.g., opening a popup with a calendar or color picker -- can benefit UX with asynchronous toggling, because clicks/taps sometimes happen accidentally while users scroll around UI content.
+
+#### Lag?
+
+As touch interfaces became popular a decade or so ago, many mobile browsers introduced a ~300ms delay before firing *click* events on UI elements, because it was felt for UX reasons that distinguishing between a *tap* and a *touch-and-drag* (or other sophisticated gestures, like *double-tap*, *pinch-to-zoom*, etc) was important.
+
+Unfortunately, for UIs (like games) where the *tap* is the main or only gesture, this across-the-board delay created a laggy feeling. Developers used multiple workarounds to avoid this delay, including [CSS `touch-action: manipulation`](https://developer.mozilla.org/en-US/docs/Web/CSS/touch-action#manipulation) and JS libraries like [FastClick](https://github.com/ftlabs/fastclick) (now deprecated).
+
+Luckily, modern browsers/devices are not necessarily applying these delays quite so universally, and there are more ways to handle these various cases and trade-offs.
+
+**Toggler** is intended to be *another tool* in that effort. You can selectively re-introduce a brief delay (even shorter than 300ms) for a specific part of a UI. *And*, you can delay both the *in* and the *out* of a toggleable state -- something the other CSS/JS solutions just mentioned don't handle.
 
 ## Deployment / Import
 
