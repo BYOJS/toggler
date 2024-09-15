@@ -1,4 +1,4 @@
-/*! Toggler: #FILENAME#
+/*! byojs/Toggler: #FILENAME#
     v#VERSION# (c) #YEAR# Kyle Simpson
     MIT License: http://getify.mit-license.org
 */

@@ -1,7 +1,7 @@
 {
 	"name": "@byojs/toggler",
 	"description": "Throttled toggler",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"exports": {
 		"./": "./dist/toggler.mjs"
 	},
@@ -18,7 +18,7 @@
 		"prepublishOnly": "npm run build:all"
 	},
 	"dependencies": {
-		"@byojs/scheduler": "~0.9.1"
+		"@byojs/scheduler": "~0.9.2"
 	},
 	"devDependencies": {
 		"micromatch": "~4.0.8",
